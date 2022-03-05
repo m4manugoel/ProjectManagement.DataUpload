@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
+	<Target Name="CopyAppSetting" AfterTargets="AfterBuild">
+		<Copy SourceFiles="appsettings.json" DestinationFolder="$(OutDir)" />
+	</Target>
+	<Target Name="CopyAppSettingOnPublish" AfterTargets="Publish">
+		<Copy SourceFiles="appsettings.json" DestinationFolder="$(PublishDir)" />
+	</Target>
+	<ItemGroup>
+		<PackageReference Include="EPPlus" Version="5.8.6" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+	</ItemGroup>
+
+</Project>
