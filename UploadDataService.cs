@@ -32,9 +32,7 @@ public class UploadDataService : IUploadDataService
 
     public async Task UploadData()
     {
-        var tokenResponse = await _tokenService.GetToken();
-        _token = tokenResponse.Data;
-        _log.LogInformation($"Token generated {_token.Token}");
+        await GenerateNewToken();
         var users = _excelService.GetUserDataFromExcel();
         if (users.Any())
         {
@@ -45,7 +43,12 @@ public class UploadDataService : IUploadDataService
     private async Task UploadUsers(List<User> users)
     {
         List<Task> tasks = new List<Task>();
+        var batchSize = 50;
         SetHttpClient();
+        var count = users.Count;
+        var batchCount = 0;
+        var totalBatch = (users.Count / batchSize) + 1;
+        _log.LogInformation($"Total count: {count}, batch: {totalBatch}");
         foreach (var user in users)
         {
             async Task UploadUserRequest()
@@ -55,12 +58,17 @@ public class UploadDataService : IUploadDataService
 
             tasks.Add(UploadUserRequest());
             counter++;
-            if (counter == 50)
+            if (counter == batchSize)
             {
                 await Task.WhenAll(tasks);
+                batchCount++;
                 tasks = new List<Task>();
-                _log.LogInformation("Batch Completed!!");
+                _log.LogInformation($"Batch {batchCount} Completed!!");
                 counter = 0;
+                if (batchCount % 25 == 0)
+                {
+                    await GenerateNewToken();
+                }
             }
         }
 
@@ -147,6 +155,13 @@ public class UploadDataService : IUploadDataService
     private async Task RefreshToken()
     {
         var tokenResponse = await _tokenService.GetTokenUsingRefreshToken(_token.Token, _token.RefreshToken);
+        _token = tokenResponse.Data;
+        _log.LogInformation($"Refresh token generated {_token.Token}");
+    }
+
+    private async Task GenerateNewToken()
+    {
+        var tokenResponse = await _tokenService.GetToken();
         _token = tokenResponse.Data;
         _log.LogInformation($"New token generated {_token.Token}");
     }

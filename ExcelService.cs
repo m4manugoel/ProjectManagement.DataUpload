@@ -38,6 +38,10 @@ public class ExcelService : IExcelService
                     {
                         users.Add(new User(name, id, phone));
                     }
+                    else
+                    {
+                        _log.LogInformation($"name-{name} ,userid - {id}, phone - {phone}");
+                    }
                 }
             }
         }
@@ -48,5 +52,5 @@ public class ExcelService : IExcelService
         return users;
     }
 
-    private bool IsValid(string str) => !string.IsNullOrWhiteSpace(str) && int.TryParse(str, out int idNumber) && idNumber > 0 && str.Length > 5;
+    private bool IsValid(string str) => !string.IsNullOrWhiteSpace(str) && long.TryParse(str, out long idNumber) && idNumber > 0 && str.Length > 5;
 }
